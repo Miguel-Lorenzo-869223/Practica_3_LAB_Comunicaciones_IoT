@@ -3,8 +3,8 @@
 #include <time.h>
 
 // Credenciales de la red Wi-Fi
-const char* ssid = "Redmi Note 13 Pro+ 5G";
-const char* password = "ccw6xiuq7esytfj";
+const char* ssid = "SSID";
+const char* password = "pswd";
 
 // Servidores NTP públicos
 const char* ntpServer1 = "pool.ntp.org";

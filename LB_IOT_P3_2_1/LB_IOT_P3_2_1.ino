@@ -8,8 +8,8 @@
 
 #include <WiFi.h>
 
-const char* ssid = "Redmi Note 13 Pro+ 5G";
-const char* password = "ccw6xiuq7esytfj";
+const char* ssid = "SSID";
+const char* password = "pswd";
 
 void setup() {
   Serial.begin(115200);
