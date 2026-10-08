@@ -1,3 +1,11 @@
+// ------------------------------------------------------------
+//  Author: Miguel A.Lorenzo
+//  Date: 08/10/2026
+//  Subject: IoT Communications Laboratory 
+//  Master: MSc in Electronic Engineering
+//  University: University of Zaragoza EINA/UNIZAR
+// ------------------------------------------------------------
+
 #include <WiFi.h>
 #include <time.h>
 
