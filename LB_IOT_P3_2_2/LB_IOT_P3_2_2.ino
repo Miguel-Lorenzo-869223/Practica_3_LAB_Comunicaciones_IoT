@@ -1,68 +1,76 @@
-// Librerías para sincronización NTP en ESP32
+// ------------------------------------------------------------
+//  Author: Miguel A.Lorenzo
+//  Date: 08/10/2026
+//  Subject: IoT Communications Laboratory 
+//  Master: MSc in Electronic Engineering
+//  University: University of Zaragoza EINA/UNIZAR
+// ------------------------------------------------------------
+
+// Libraries for NTP synchronization on ESP32
 #include <WiFi.h>
 #include <time.h>
 
-// Credenciales de la red Wi-Fi
+// Wi-Fi network credentials
 const char* ssid = "SSID";
 const char* password = "pswd";
 
-// Servidores NTP públicos
+// Public NTP servers
 const char* ntpServer1 = "pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 
-// Cadena POSIX para España peninsular / Europa Central (CET/CEST)
-// CET-1CEST: UTC+1 en invierno, UTC+2 en verano
-// M3.5.0: Cambio a verano el último domingo de marzo
-// M10.5.0/3: Cambio a invierno el último domingo de octubre a las 3:00
+// POSIX timezone string for Peninsular Spain / Central Europe (CET/CEST)
+// CET-1CEST: UTC+1 in winter, UTC+2 in summer
+// M3.5.0: Daylight saving time starts on the last Sunday of March
+// M10.5.0/3: Standard time starts on the last Sunday of October at 3:00 AM
 const char* tzInfo = "CET-1CEST,M3.5.0,M10.5.0/3";
 
 void connectWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  Serial.print("Conectando a WiFi");
+  Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\n¡WiFi Conectado!");
-  Serial.print("IP asignada: ");
+  Serial.println("\nWiFi Connected!");
+  Serial.print("Assigned IP: ");
   Serial.println(WiFi.localIP());
 }
 
 void syncTime() {
-  // Configura el cliente NTP interno de la ESP32
+  // Configure the internal ESP32 NTP client
   configTime(0, 0, ntpServer1, ntpServer2);
 
-  // Aplica la zona horaria europea/española
+  // Apply the European/Spanish timezone configuration
   setenv("TZ", tzInfo, 1);
   tzset();
 
-  Serial.println("Sincronizando hora con servidor NTP...");
+  Serial.println("Synchronizing time with NTP server...");
   
-  // Espera a recibir un timestamp válido (posterior al 1 de enero de 2020)
+  // Wait to receive a valid timestamp (after January 1, 2020)
   time_t now = 0;
   while (time(&now) < 1577836800) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\n¡Hora sincronizada correctamente!");
+  Serial.println("\nTime synchronized successfully!");
 }
 
-// Función para imprimir la fecha en formato DD/MM/AAAA HH:MM:SS
+// Function to print the date and time in DD/MM/YYYY HH:MM:SS format
 void printDateTime() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo, 2000)) {
-    Serial.println("Error al obtener la hora");
+    Serial.println("Error obtaining time");
     return;
   }
 
   char formattedTime[80];
-  // %d = Día (01-31), %m = Mes (01-12), %Y = Año (4 dígitos)
-  // %H = Hora (00-23), %M = Minuto (00-59), %S = Segundo (00-59)
+  // %d = Day (01-31), %m = Month (01-12), %Y = Year (4 digits)
+  // %H = Hour (00-23), %M = Minute (00-59), %S = Second (00-59)
   strftime(formattedTime, sizeof(formattedTime), "%d/%m/%Y %H:%M:%S", &timeinfo);
   
-  Serial.print("Fecha y Hora actual: ");
+  Serial.print("Current Date and Time: ");
   Serial.println(formattedTime);
 }
 
@@ -76,5 +84,5 @@ void setup() {
 
 void loop() {
   printDateTime();
-  delay(1000); // Muestra la hora cada segundo
+  delay(1000); // Display the time every second
 }
