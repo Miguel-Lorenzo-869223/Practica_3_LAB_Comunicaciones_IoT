@@ -8,37 +8,39 @@
 
 #include <WiFi.h>
 
+// WiFi credentials
 const char* ssid = "SSID";
-const char* password = "pswd";
+const char* password = "PSWD";
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  Serial.println("\nConectando a WiFi...");
+  Serial.println("\nConnecting to WiFi...");
   WiFi.begin(ssid, password);
 
+  // Wait until the connection is established
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("\n¡WiFi conectado!");
-  Serial.print("Dirección IP: ");
+  Serial.println("\nWiFi connected!");
+  Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
-  // Comprobar conectividad TCP a Google
-  Serial.println("Comprobando conectividad con google.com...");
+  // Check TCP connectivity to Google
+  Serial.println("Checking connectivity to google.com...");
   WiFiClient client;
   
   if (client.connect("google.com", 80)) {
-    Serial.println("¡Conexión exitosa a Google! (HTTP 80 OK)");
+    Serial.println("Successful connection to Google! (HTTP 80 OK)");
     client.stop();
   } else {
-    Serial.println("Error: No se pudo conectar a Google.");
+    Serial.println("Error: Could not connect to Google.");
   }
 }
 
 void loop() {
-  // Sin código en el bucle principal
+  // Main loop is intentionally left blank
 }
