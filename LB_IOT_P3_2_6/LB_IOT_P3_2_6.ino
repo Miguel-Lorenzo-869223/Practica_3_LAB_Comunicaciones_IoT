@@ -5,32 +5,27 @@
 //  Master: MSc in Electronic Engineering
 //  University: University of Zaragoza EINA/UNIZAR
 // ------------------------------------------------------------
-
 #include <WiFi.h>
-#include <time.h>
-#include <math.h>
 
-// WiFi Configuration
+// Configuración de la red Wi-Fi
 const char* ssid     = "Redmi Note 13 Pro+ 5G";
 const char* password = "ccw6xiuq7esytfj";
 
-// Socket Server Configuration
-const char* serverIP = "10.44.84.148"; // IP de tu ordenador
-const int serverPort = 5000;           // Puerto TCP
+// Configuración del Servidor TCP (Pon la IP de TU PC)
+const char* serverIP = "10.44.84.148"; 
+const int serverPort = 5000; // Usar puerto libre > 1024
 
-// Finite State Machine (FSM) States
+// Máquina de estados
 enum SystemState {
   STATE_STOPPED,
   STATE_RUNNING
 };
 
 SystemState currentState = STATE_STOPPED;
-
 WiFiClient client;
 unsigned long lastSendTime = 0;
-float angle = 0.0; // Variable para simular variación de aceleración
 
-// Function Declarations
+// Declaración de funciones
 void connectToWiFi();
 void manageConnection();
 void handleSocketCommands();
@@ -53,36 +48,35 @@ void loop() {
       break;
 
     case STATE_STOPPED:
-      // Waiting for 'start' command
+      // En reposo: esperando comando 'start'
       break;
   }
 }
 
-// Connects to WiFi AP
 void connectToWiFi() {
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
+  Serial.print("Conectando a WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nWiFi Connected.");
+  Serial.println("\nWiFi Conectada.");
+  Serial.print("IP local de la ESP32: ");
+  Serial.println(WiFi.localIP());
 }
 
-// Manages TCP Connection
 void manageConnection() {
   if (!client.connected()) {
-    Serial.println("Connecting to TCP Server...");
+    Serial.println("Conectando al servidor TCP...");
     if (client.connect(serverIP, serverPort)) {
-      Serial.println("Connected to TCP Server successfully.");
+      Serial.println("Conectado al servidor con éxito.");
     } else {
-      Serial.println("Connection failed. Retrying...");
+      Serial.println("Error de conexión. Reintentando...");
       delay(2000);
     }
   }
 }
 
-// Processes incoming control commands ('start' / 'stop')
 void handleSocketCommands() {
   while (client.available() > 0) {
     String incomingMsg = client.readStringUntil('\n');
@@ -90,35 +84,32 @@ void handleSocketCommands() {
 
     if (incomingMsg.equalsIgnoreCase("start")) {
       currentState = STATE_RUNNING;
-      Serial.println("FSM State -> STATE_RUNNING");
-      client.println(">> OK: Streaming STARTED");
+      Serial.println("Estado FSM -> STATE_RUNNING");
+      client.println(">> OK: Transmision iniciada");
     } 
     else if (incomingMsg.equalsIgnoreCase("stop")) {
       currentState = STATE_STOPPED;
-      Serial.println("FSM State -> STATE_STOPPED");
-      client.println(">> OK: Streaming STOPPED");
+      Serial.println("Estado FSM -> STATE_STOPPED");
+      client.println(">> OK: Transmision detenida");
     }
   }
 }
 
-// Generates and transmits simulated accelerometer data (X,Y,Z)
 void sendSimulatedAccelData() {
-  if (millis() - lastSendTime >= 200) { // Envía cada 200 ms
+  if (millis() - lastSendTime >= 1000) { // Envía datos cada 1 segundo
     lastSendTime = millis();
 
-    // Generación de datos simulados (en m/s²)
-    angle += 0.1;
-    float simulated_x = sin(angle) * 9.81;
-    float simulated_y = cos(angle) * 4.90;
-    float simulated_z = 9.81 + (sin(angle * 2) * 0.5);
+    // Generar datos aleatorios simulados (-1.00 a 1.00 m/s²)
+    float ax = random(-100, 101) / 100.0;
+    float ay = random(-100, 101) / 100.0;
+    float az = random(-100, 101) / 100.0;
 
-    // Format: ACCEL:X,Y,Z
-    String payload = "ACCEL:" + String(simulated_x, 2) + "," + 
-                                String(simulated_y, 2) + "," + 
-                                String(simulated_z, 2);
-
+    // Enviar por el socket TCP en formato CSV: ACCEL:X,Y,Z
+    String payload = "ACCEL:" + String(ax, 2) + "," + String(ay, 2) + "," + String(az, 2);
     client.println(payload);
-    Serial.print("Sent: ");
+
+    // Mostrar por monitor serie
+    Serial.print("Enviado por TCP: ");
     Serial.println(payload);
   }
 }
