@@ -7,16 +7,31 @@
 //  University: University of Zaragoza EINA/UNIZAR
 // ------------------------------------------------------------
 
+/*
+struct tm {
+  int tm_sec;   // Segundos (0-60)
+  int tm_min;   // Minutos (0-59)
+  int tm_hour;  // Horas (0-23)
+  int tm_mday;  // Día del mes (1-31)
+  int tm_mon;   // Mes (0-11)
+  int tm_year;  // Año desde 1900
+  int tm_wday;  // Día de la semana (0-6)
+  int tm_yday;  // Día del año (0-365)
+  int tm_isdst; // Horario de verano (sí/no)
+};
+*/
+
+
 #include <WiFi.h>
 #include <time.h>
 
 // WiFi Configuration
-const char* ssid     = "ssid";
-const char* password = "pswd";
+const char* ssid     = "SSID";
+const char* password = "pwsd";
 
 // Socket Server Configuration
 const char* serverIP = "aaa.bbb.ccc.ddd"; // Target PC IP
-const int serverPort = 898;            // Target Server Port
+const int serverPort = 487 ;            // Target Server Port
 
 // NTP Server Configuration
 const char* ntpServer = "pool.ntp.org";
@@ -109,19 +124,29 @@ void manageConnection() {
 
 // Reads incoming socket data and triggers state transitions
 void handleSocketCommands() {
-  while (client.available() > 0) {
-    String incomingMsg = client.readStringUntil('\n');
-    incomingMsg.trim(); // Remove whitespaces, \r, and \n
+  static String rxBuffer = ""; // Maintains buffer state between function calls
 
-    if (incomingMsg.equalsIgnoreCase("start")) {
-      currentState = STATE_RUNNING;
-      Serial.println("FSM State -> STATE_RUNNING");
-      client.println(">> OK: Time streaming STARTED");
+  while (client.available() > 0) {
+    char c = client.read(); // Read byte by byte instantly without waiting
+
+    if (c == '\n') { // Line finished, process command
+      rxBuffer.trim(); // Remove whitespaces and \r
+
+      if (rxBuffer.equalsIgnoreCase("start")) {
+        currentState = STATE_RUNNING;
+        Serial.println("FSM State -> STATE_RUNNING");
+        client.println(">> OK: Time streaming STARTED");
+      } 
+      else if (rxBuffer.equalsIgnoreCase("stop")) {
+        currentState = STATE_STOPPED;
+        Serial.println("FSM State -> STATE_STOPPED");
+        client.println(">> OK: Time streaming STOPPED");
+      }
+
+      rxBuffer = ""; // Reset buffer for the next message
     } 
-    else if (incomingMsg.equalsIgnoreCase("stop")) {
-      currentState = STATE_STOPPED;
-      Serial.println("FSM State -> STATE_STOPPED");
-      client.println(">> OK: Time streaming STOPPED");
+    else if (c != '\r') {
+      rxBuffer += c; // Append character to buffer
     }
   }
 }
