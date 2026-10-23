@@ -143,13 +143,13 @@ The lab is divided into eight progressive practical exercises covering network s
 
 ## 🚀 How to Build & Run
 
-### Running TCP Socket & FSM Exercises (Exercises 1.1 – 1.5 / ENSEÑAR 1)
+### Running TCP Socket & FSM Exercises (Exercises 1.1 – 1.5)
 1. Open **SocketTest** on your PC (or **Simple TCP Socket Tester** on Android) and start a TCP Server listening on port `487`.
 2. Configure Wi-Fi credentials (`ssid`, `password`) and target `serverIP` in `LB_IOT_P3_4_Socket_FSM.ino`.
 3. Select **ESP32 Dev Module** in **Arduino IDE**, upload the sketch, and open the Serial Monitor at **115200 baud**.
 4. In SocketTest, send the string `start` to trigger 1-second timestamp streaming, and `stop` to halt execution.
 
-### Running Python Accelerometer Telemetry (Exercise 2 / ENSEÑAR 2)
+### Running Python Accelerometer Telemetry (Exercise 2)
 1. Determine your computer's local IP address (`ipconfig` on Windows or `ifconfig` on Linux/Mac).
 2. Launch the host Python TCP server in your terminal:
    ```bash
@@ -158,7 +158,7 @@ The lab is divided into eight progressive practical exercises covering network s
 3. Enter your computer's IP address in `serverIP` inside `LB_IOT_P3_5_TCP_Accel_Stream.ino` and upload to the ESP32.
 4. Observe connection acceptance in the Python terminal, automatic transmission of the `start` command, and live rendering of incoming `ACCEL:X,Y,Z` telemetry stream.
 
-### Running Embedded Web Server (Exercise 3 / ENSEÑAR 3)
+### Running Embedded Web Server (Exercise 3)
 1. Upload `LB_IOT_P3_6_WebServer_Clock.ino` to the ESP32.
 2. Read the assigned local IP address printed on the Serial Monitor (e.g., `192.168.1.150`).
 3. Open a web browser on any device connected to the same network and navigate to `http://<ESP32_IP>`.
