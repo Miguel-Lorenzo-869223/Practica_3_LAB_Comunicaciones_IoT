@@ -12,8 +12,8 @@
 #include <sys/time.h>
 
 // WiFi Configuration
-const char* ssid     = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+const char* ssid     = "SSID";
+const char* password = "PSWD";
 
 // NTP Server Configuration
 const long gmtOffset_sec      = 3600; // UTC+1
@@ -140,6 +140,9 @@ void handleRoot() {
 
   server.send(200, "text/html", html);
 }
+
+
+
 
 // Handles GET request '/reset': Resets clock to 00:00:00 and redirects to root
 void handleReset() {
